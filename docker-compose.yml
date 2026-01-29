@@ -1,0 +1,20 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: cofre_vault
+    restart: always
+    environment:
+      - DOMAIN=https://localhost:8100
+    volumes:
+      - ./vw-data:/data
+
+  caddy:
+    image: caddy:2
+    container_name: cofre_seguranca
+    restart: always
+    ports:
+      - "8100:8100"
+    # Este comando cria um HTTPS local automaticamente
+    command: caddy reverse-proxy --from https://localhost:8100 --to http://cofre_vault:80 --internal-certs
+    depends_on:
+      - vaultwarden
